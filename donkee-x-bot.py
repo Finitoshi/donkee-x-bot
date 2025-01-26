@@ -1,6 +1,4 @@
 import tweepy
-import time
-import random
 import requests
 import json
 import os
@@ -71,14 +69,6 @@ def post_tweet(message):
     except tweepy.TweepError as e:
         logger.error(f"Error posting tweet: {e.reason if hasattr(e, 'reason') else str(e)}")
 
-def main():
-    while True:
-        tweet = generate_tweet_with_grok()
-        post_tweet(tweet)
-
-        # Sleep with some jitter to avoid exact hourly patterns
-        sleep_time = 7200 + random.randint(-300, 300)  # 2 hours +/- 5 minutes
-        time.sleep(sleep_time)
-
 if __name__ == "__main__":
-    main()
+    tweet = generate_tweet_with_grok()
+    post_tweet(tweet)
