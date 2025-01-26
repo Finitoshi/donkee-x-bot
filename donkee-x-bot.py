@@ -66,8 +66,10 @@ def post_tweet(message):
     try:
         api.update_status(message)
         logger.info(f"Successfully posted tweet: {message[:50]}...")
-    except tweepy.TweepError as e:
-        logger.error(f"Error posting tweet: {e.reason if hasattr(e, 'reason') else str(e)}")
+    except tweepy.errors.Forbidden as e:
+        logger.error(f"Access Forbidden: {e}")
+    except tweepy.errors.TweepyException as e:
+        logger.error(f"Tweepy Error: {e}")
 
 if __name__ == "__main__":
     tweet = generate_tweet_with_grok()
