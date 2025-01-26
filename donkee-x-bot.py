@@ -24,7 +24,8 @@ if not bearer_token:
     exit(1)
 
 # Authentication - Using OAuth 2.0 with the pre-existing bearer token
-client = tweepy.Client(bearer_token=bearer_token)
+auth = tweepy.OAuth2BearerHandler(bearer_token)
+client = tweepy.Client(auth)
 
 # Track when the last tweet was posted to respect the 24-hour limit
 last_tweet_time = None
