@@ -1,6 +1,3 @@
-# initial_token_setup.py
-# This script should be run once to get the initial OAuth tokens for the bot.
-
 import tweepy
 import requests
 import json
