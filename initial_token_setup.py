@@ -19,7 +19,8 @@ load_dotenv()
 
 client_id = os.environ.get('X_CLIENT_ID')
 client_secret = os.environ.get('X_CLIENT_SECRET')
-redirect_uri = os.environ.get('X_REDIRECT_URI', 'http://localhost')
+# Using the Render service URL as the redirect URI
+redirect_uri = os.environ.get('X_REDIRECT_URI', 'https://your-render-service-name.onrender.com/')
 
 def generate_code_verifier():
     # Generate a random code verifier for PKCE
@@ -39,8 +40,8 @@ def get_initial_tokens():
     authorize_url = f"https://x.com/i/oauth2/authorize?response_type=code&client_id={client_id}&redirect_uri={redirect_uri}&scope=tweet.write&code_challenge={code_challenge}&code_challenge_method=S256"
     print(f"Please visit this URL to authorize the app: {authorize_url}")
     
-    # Wait for user to input the authorization code after manually authorizing
-    auth_code = input("Enter the authorization code you received: ")
+    # Wait for user to input the authorization code after manually authorizing via the Render service
+    auth_code = input("Enter the authorization code you received from your Render service: ")
 
     token_url = "https://api.x.com/2/oauth2/token"
     data = {
