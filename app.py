@@ -4,7 +4,6 @@ import json
 import os
 import logging
 from datetime import datetime, timedelta
-from dotenv import load_dotenv
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
