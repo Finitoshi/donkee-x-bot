@@ -9,10 +9,6 @@ from datetime import datetime, timedelta
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# OAuth 2.0 Credentials
-client_id = os.environ.get('X_CLIENT_ID')
-client_secret = os.environ.get('X_CLIENT_SECRET')
-
 # Grok API Key - Use environment variables
 GROK_API_KEY = os.environ.get('GROK_API_KEY')
 if not GROK_API_KEY:
@@ -21,32 +17,13 @@ if not GROK_API_KEY:
 
 GROK_API_URL = "https://api.x.ai/v1/chat/completions"
 
-# Function to get bearer token using client credentials
-def get_bearer_token():
-    token_url = "https://api.twitter.com/2/oauth2/token"
-    data = {
-        "grant_type": "client_credentials"
-    }
-    headers = {
-        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
-    }
-    
-    response = requests.post(token_url, auth=(client_id, client_secret), data=data, headers=headers)
-    
-    if response.status_code == 200:
-        return response.json().get('access_token')
-    else:
-        logger.error(f"Failed to get bearer token: {response.status_code} - {response.text}")
-        return None
-
-# Get the bearer token
-bearer_token = get_bearer_token()
-
+# Use the bearer token directly from environment variables
+bearer_token = os.environ.get('X_BEARER_TOKEN')
 if not bearer_token:
-    logger.error("Could not obtain bearer token. Exiting.")
+    logger.error("X_BEARER_TOKEN is not set in the environment")
     exit(1)
 
-# Authentication - Using OAuth 2.0
+# Authentication - Using OAuth 2.0 with the pre-existing bearer token
 client = tweepy.Client(bearer_token=bearer_token)
 
 # Track when the last tweet was posted to respect the 24-hour limit
