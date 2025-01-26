@@ -1,6 +1,3 @@
-# callback_handler.py
-# This Flask app handles OAuth callback from X
-
 from flask import Flask, request
 import os
 import logging
