@@ -3,6 +3,7 @@ import requests
 import json
 import os
 import logging
+from datetime import datetime, timedelta
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -22,10 +23,12 @@ if not GROK_API_KEY:
 
 GROK_API_URL = "https://api.x.ai/v1/chat/completions"
 
-# Authentication
-auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-auth.set_access_token(access_token, access_token_secret)
-api = tweepy.API(auth, wait_on_rate_limit=True)
+# Authentication - Note: Using v2 of the API
+client = tweepy.Client(consumer_key=consumer_key, consumer_secret=consumer_secret, 
+                       access_token=access_token, access_token_secret=access_token_secret)
+
+# Track when the last tweet was posted to respect the 24-hour limit
+last_tweet_time = None
 
 def generate_tweet_with_grok():
     payload = {
@@ -63,14 +66,25 @@ def generate_tweet_with_grok():
         return "Error parsing Grok API response"
 
 def post_tweet(message):
-    try:
-        api.update_status(message)
-        logger.info(f"Successfully posted tweet: {message[:50]}...")
-    except tweepy.errors.Forbidden as e:
-        logger.error(f"Access Forbidden: {e}")
-    except tweepy.errors.TweepyException as e:
-        logger.error(f"Tweepy Error: {e}")
+    global last_tweet_time
+    now = datetime.now()
+
+    # Check if 24 hours have passed since the last tweet
+    if last_tweet_time is None or now - last_tweet_time >= timedelta(hours=24):
+        try:
+            response = client.create_tweet(text=message)
+            logger.info(f"Successfully posted tweet: {message[:50]}...")
+            last_tweet_time = now  # Update the last tweet time
+            return True
+        except tweepy.errors.TweepyException as e:
+            logger.error(f"Tweepy Error: {e}")
+            return False
+    else:
+        time_left = timedelta(hours=24) - (now - last_tweet_time)
+        logger.info(f"Waiting to post next tweet. Time left: {time_left}")
+        return False
 
 if __name__ == "__main__":
     tweet = generate_tweet_with_grok()
-    post_tweet(tweet)
+    if not post_tweet(tweet):
+        logger.info("Tweet not posted due to rate limit.")
