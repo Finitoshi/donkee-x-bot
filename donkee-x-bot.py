@@ -17,15 +17,20 @@ if not GROK_API_KEY:
 
 GROK_API_URL = "https://api.x.ai/v1/chat/completions"
 
-# Use the bearer token directly from environment variables
-bearer_token = os.environ.get('X_BEARER_TOKEN')
-if not bearer_token:
-    logger.error("X_BEARER_TOKEN is not set in the environment")
+# OAuth 1.0a Credentials - Use environment variables
+consumer_key = os.environ.get('X_CONSUMER_KEY')
+consumer_secret = os.environ.get('X_CONSUMER_SECRET')
+access_token = os.environ.get('X_ACCESS_TOKEN')
+access_token_secret = os.environ.get('X_ACCESS_TOKEN_SECRET')
+
+if not all([consumer_key, consumer_secret, access_token, access_token_secret]):
+    logger.error("One or more OAuth 1.0a credentials are missing from the environment")
     exit(1)
 
-# Authentication - Using OAuth 2.0 with the pre-existing bearer token
-auth = tweepy.OAuth2BearerHandler(bearer_token)
-client = tweepy.Client(auth, user_auth=False)
+# Authentication - Using OAuth 1.0a for user context
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_token_secret)
+client = tweepy.API(auth)
 
 # Track when the last tweet was posted to respect the 24-hour limit
 last_tweet_time = None
@@ -69,14 +74,14 @@ def post_tweet(message):
     global last_tweet_time
     now = datetime.now()
 
-    # Check if 24 hours have passed since the last tweet
     if last_tweet_time is None or now - last_tweet_time >= timedelta(hours=24):
         try:
-            response = client.create_tweet(text=message)
+            # Using update_status method which requires user context
+            response = client.update_status(message)
             logger.info(f"Successfully posted tweet: {message[:50]}...")
             last_tweet_time = now  # Update the last tweet time
             return True
-        except tweepy.errors.TweepyException as e:
+        except tweepy.TweepError as e:
             logger.error(f"Tweepy Error: {e}")
             return False
     else:
