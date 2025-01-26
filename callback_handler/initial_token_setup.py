@@ -10,9 +10,6 @@ import hashlib
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Load environment variables
-load_dotenv()
-
 client_id = os.environ.get('X_CLIENT_ID')
 client_secret = os.environ.get('X_CLIENT_SECRET')
 redirect_uri = os.environ.get('X_REDIRECT_URI', 'https://your-render-service-name.onrender.com/')
