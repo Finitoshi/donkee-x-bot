@@ -20,7 +20,7 @@ load_dotenv()
 client_id = os.environ.get('X_CLIENT_ID')
 client_secret = os.environ.get('X_CLIENT_SECRET')
 # Using the Render service URL as the redirect URI
-redirect_uri = os.environ.get('X_REDIRECT_URI', 'https://your-render-service-name.onrender.com/')
+redirect_uri = os.environ.get('X_REDIRECT_URI')
 
 def generate_code_verifier():
     # Generate a random code verifier for PKCE
