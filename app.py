@@ -9,9 +9,6 @@ from datetime import datetime, timedelta
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Load environment variables
-load_dotenv()
-
 # Grok API Key
 GROK_API_KEY = os.environ.get('GROK_API_KEY')
 if not GROK_API_KEY:
